@@ -1,0 +1,8 @@
+{
+  "tag": "html",
+  "attributes": [
+    {
+      "preset": "lit-html"
+    }
+  ]
+}

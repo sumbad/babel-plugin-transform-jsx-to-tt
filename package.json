@@ -1,0 +1,40 @@
+{
+  "version": "0.0.0",
+  "description": "The babel plugin converts JSX into Tagged templates",
+  "repository": "babel-plugin-transform-jsx-to-tt",
+  "author": "Denis Sumbaev <sumbad@ya.ru>",
+  "scripts": {
+    "clean": "rm -rf lib",
+    "build": "babel src -d lib --extensions '.ts'",
+    "test": "jest test/",
+    "test:watch": "npm run test -- --watch",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "lib/index.js",
+  "keywords": [
+    "babel-plugin",
+    "tagged templates"
+  ],
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-syntax-jsx": "^7.8.3",
+    "@babel/plugin-transform-classes": "^7.9.5",
+    "core-js": "^3.6.5"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.0.0-0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "7.9.0",
+    "@babel/helper-builder-react-jsx": "7.9.0",
+    "@babel/preset-typescript": "^7.9.0",
+    "babel-jest": "^25.3.0",
+    "babel-plugin-tester": "^9.0.1",
+    "jest": "^25.3.0"
+  }
+}

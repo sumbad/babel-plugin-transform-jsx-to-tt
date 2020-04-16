@@ -1,0 +1,28 @@
+{
+  "tag": "html",
+  "attributes": [
+    {
+      "prefix": "",
+      "attributes": [
+        "on.*"
+      ]
+    },
+    {
+      "preset": "global"
+    },
+    {
+      "prefix": "",
+      "attributes": [
+        "hidden",
+        "draggable",
+        "spellcheck"
+      ]
+    },
+    {
+      "prefix": ".",
+      "attributes": [
+        ".*"
+      ]
+    }
+  ]
+}
