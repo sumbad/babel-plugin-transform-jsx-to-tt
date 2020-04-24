@@ -12,6 +12,7 @@
     "build": "babel src -d lib --extensions '.ts'",
     "test": "jest test/",
     "test:watch": "npm run test -- --watch",
+    "test:coverage": "npm run jest -- --coverage",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "license": "MIT",
