@@ -1,5 +1,0 @@
-{
-  "parserOpts": {
-    "plugins": ["jsx", "class-properties"]
-  }
-}
