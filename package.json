@@ -2,7 +2,10 @@
   "version": "0.0.0",
   "name": "babel-plugin-transform-jsx-to-tt",
   "description": "The babel plugin converts JSX into Tagged templates",
-  "repository": "babel-plugin-transform-jsx-to-tt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sumbad/babel-plugin-transform-jsx-to-tt"
+  },
   "author": "Denis Sumbaev <sumbad@ya.ru>",
   "scripts": {
     "clean": "rm -rf lib",
