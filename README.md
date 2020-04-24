@@ -29,56 +29,56 @@ That can work with [hyperHTML](https://github.com/WebReflection/hyperHTML), [lit
   <summary><strong>Attributes in lit-html</strong></summary>
   <div>
 
-  **In**
+**In**
 
-  ```jsx
-  const baz = (
-    <div>
-      <li attr1="A">First item</li>
-      <li attr2="B">Second item</li>
-      <li attr3="C">Third item</li>
-      <li class="main-colour">Third item</li>
-      <li hidden={true}>Third item</li>
-      <li onclick={() => console.log('test')}>Third item</li>
-      <button color="blue" shadowSize={2} shadowSizeSum={2 + 1 + 1}>
-        <small id={Date.now()}>Click Me</small>
-      </button>
-      <my-comp message={'hello world'}></my-comp>
-      <my-text-box autocomplete={true} />
-    </div>
-  );
-  ```
-
-  **Out**
-
-  ```js
-  const baz = html`<div>
-    <li .attr1="A">First item</li>
-    <li .attr2="B">Second item</li>
-    <li .attr3="C">Third item</li>
+```jsx
+const baz = (
+  <div>
+    <li attr1="A">First item</li>
+    <li attr2="B">Second item</li>
+    <li attr3="C">Third item</li>
     <li class="main-colour">Third item</li>
-    <li ?hidden=${true}>Third item</li>
-    <li @click=${() => console.log('test')}>Third item</li>
-    <button .color="blue" .shadowSize=${2} .shadowSizeSum=${2 + 1 + 1}>
-      <small id=${Date.now()}>Click Me</small>
+    <li hidden={true}>Third item</li>
+    <li onclick={() => console.log('test')}>Third item</li>
+    <button color="blue" shadowSize={2} shadowSizeSum={2 + 1 + 1}>
+      <small id={Date.now()}>Click Me</small>
     </button>
-    <my-comp .message=${'hello world'}></my-comp>
-    <my-text-box .autocomplete=${true}></my-text-box>
-  </div>`;
-  ```
+    <my-comp message={'hello world'}></my-comp>
+    <my-text-box autocomplete={true} />
+  </div>
+);
+```
 
-  **Options**
+**Out**
 
-  ```json
-  {
-    "tag": "html",
-    "attributes": [
-      {
-        "preset": "lit-html"
-      }
-    ]
-  }
-  ```
+```js
+const baz = html`<div>
+  <li .attr1="A">First item</li>
+  <li .attr2="B">Second item</li>
+  <li .attr3="C">Third item</li>
+  <li class="main-colour">Third item</li>
+  <li ?hidden=${true}>Third item</li>
+  <li @click=${() => console.log('test')}>Third item</li>
+  <button .color="blue" .shadowSize=${2} .shadowSizeSum=${2 + 1 + 1}>
+    <small id=${Date.now()}>Click Me</small>
+  </button>
+  <my-comp .message=${'hello world'}></my-comp>
+  <my-text-box .autocomplete=${true}></my-text-box>
+</div>`;
+```
+
+**Options**
+
+```json
+{
+  "tag": "html",
+  "attributes": [
+    {
+      "preset": "lit-html"
+    }
+  ]
+}
+```
 
   </div>
 </details>
@@ -87,54 +87,56 @@ That can work with [hyperHTML](https://github.com/WebReflection/hyperHTML), [lit
   <summary><strong>Composition</strong></summary>
   <div>
 
-  **In**
+**In**
 
-  **Bar.jsx**
-  ```jsx
-  export class Bar {
-    static define = (tag) => (properties) => AbstractElement;
-    render(){
-      return <p>Hello, World!</p>;
-    }
+**Bar.jsx**
+
+```jsx
+export class Bar {
+  static define = (tag) => (properties) => AbstractElement;
+  render() {
+    return <p>Hello, World!</p>;
   }
-  ```
+}
+```
 
-  **index.jsx**
-  ```jsx
-  import { Bar } from './Bar';
+**index.jsx**
 
-  const BarElement = Bar.define('bar-bar');
+```jsx
+import { Bar } from './Bar';
 
-  const define = tag => {};
+const BarElement = Bar.define('bar-bar');
 
-  const FooElement = define('foo-foo');
+const define = (tag) => {};
 
-  const baz = (
-    <div>
-      <p>Hello, World!</p>
-      <BarElement></BarElement>
-      <FooElement></FooElement>
-      <p>Hello, World!</p>
-    </div>
-  );
-  ```
+const FooElement = define('foo-foo');
 
-  **Out**
-
-  ```js
-  import { Bar } from "./Bar";
-  const BarElement = Bar.define("bar-bar");
-
-  const define = (tag) => {};
-
-  const FooElement = define("foo-foo");
-  const baz = html`<div>
+const baz = (
+  <div>
     <p>Hello, World!</p>
-    <bar-bar></bar-bar>
-    <foo-foo></foo-foo>
+    <BarElement></BarElement>
+    <FooElement></FooElement>
     <p>Hello, World!</p>
-  </div>`;
-  ```
+  </div>
+);
+```
+
+**Out**
+
+```js
+import { Bar } from './Bar';
+const BarElement = Bar.define('bar-bar');
+
+const define = (tag) => {};
+
+const FooElement = define('foo-foo');
+const baz = html`<div>
+  <p>Hello, World!</p>
+  <bar-bar></bar-bar>
+  <foo-foo></foo-foo>
+  <p>Hello, World!</p>
+</div>`;
+```
 
   </div>
 </details>
@@ -143,103 +145,99 @@ That can work with [hyperHTML](https://github.com/WebReflection/hyperHTML), [lit
   <summary><strong>Class component</strong></summary>
   <div>
 
-  **In**
+**In**
 
-  ```jsx
-  import { AbstractElement } from 'abstract-element';
-  import litRender from 'abstract-element/render/lit';
+```jsx
+import { AbstractElement } from 'abstract-element';
+import litRender from 'abstract-element/render/lit';
 
+export class Loader extends AbstractElement {
+  static define = (tag) => (properties) => AbstractElement;
+  loading;
 
-  export class Loader extends AbstractElement {
-    static define = tag => properties => AbstractElement;
-    loading;
-
-    constructor() {
-      super(litRender, true);
-    }
-
-    render() {
-      return this.loading ? <span>Loading 3 seconds, please...</span> : <span>That's a loaded content!</span>;
-    }
+  constructor() {
+    super(litRender, true);
   }
 
-  const ElementLoader = Loader.define('a-a');
-
-
-  export class Converter extends AbstractElement {
-    loading = true;
-
-    constructor() {
-      super(litRender, true);
-
-      setInterval(() => {
-        this.loading = !this.loading;
-      }, 3000);
-    }
-
-    render() {
-      return (
-        <div>
-          ⌛<ElementLoader loading={this.loading}></ElementLoader>
-        </div>
-      );
-    }
+  render() {
+    return this.loading ? <span>Loading 3 seconds, please...</span> : <span>That's a loaded content!</span>;
   }
-  ```
+}
 
-  **Out**
+const ElementLoader = Loader.define('a-a');
 
-  ```js
-  import { html } from "lit-html";
-  import { AbstractElement } from "abstract-element";
-  import litRender from "abstract-element/render/lit";
-  export class Loader extends AbstractElement {
-    static define = (tag) => (properties) => AbstractElement;
-    loading;
+export class Converter extends AbstractElement {
+  loading = true;
 
-    constructor() {
-      super(litRender, true);
-    }
+  constructor() {
+    super(litRender, true);
 
-    render() {
-      return this.loading
-        ? html`<span>Loading 3 seconds, please...</span>`
-        : html`<span>That's a loaded content!</span>`;
-    }
+    setInterval(() => {
+      this.loading = !this.loading;
+    }, 3000);
   }
-  const ElementLoader = Loader.define("a-a");
-  export class Converter extends AbstractElement {
-    loading = true;
 
-    constructor() {
-      super(litRender, true);
-      setInterval(() => {
-        this.loading = !this.loading;
-      }, 3000);
-    }
-
-    render() {
-      return html`<div>⌛<a-a .loading=${this.loading}></a-a></div>`;
-    }
+  render() {
+    return (
+      <div>
+        ⌛<ElementLoader loading={this.loading}></ElementLoader>
+      </div>
+    );
   }
-  ```
+}
+```
 
-  **Options**
+**Out**
 
-  ```json
-  {
-    "tag": "html",
-    "import": {
-      "module": "lit-html",
-      "export": "html"
-    },
-    "attributes": [
-      {
-        "preset": "lit-html"
-      }
-    ]
+```js
+import { html } from 'lit-html';
+import { AbstractElement } from 'abstract-element';
+import litRender from 'abstract-element/render/lit';
+export class Loader extends AbstractElement {
+  static define = (tag) => (properties) => AbstractElement;
+  loading;
+
+  constructor() {
+    super(litRender, true);
   }
-  ```
+
+  render() {
+    return this.loading ? html`<span>Loading 3 seconds, please...</span>` : html`<span>That's a loaded content!</span>`;
+  }
+}
+const ElementLoader = Loader.define('a-a');
+export class Converter extends AbstractElement {
+  loading = true;
+
+  constructor() {
+    super(litRender, true);
+    setInterval(() => {
+      this.loading = !this.loading;
+    }, 3000);
+  }
+
+  render() {
+    return html`<div>⌛<a-a .loading=${this.loading}></a-a></div>`;
+  }
+}
+```
+
+**Options**
+
+```json
+{
+  "tag": "html",
+  "import": {
+    "module": "lit-html",
+    "export": "html"
+  },
+  "attributes": [
+    {
+      "preset": "lit-html"
+    }
+  ]
+}
+```
 
   </div>
 </details>
@@ -286,14 +284,58 @@ require('babel-core').transform('code', {
 
 ## Options
 
+<table>
+  <thead>
+    <tr>
+    <th>Option</th>
+    <th>Type</th>
+    <th>Default</th>
+    <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>tag</code>
+      </td>
+      <td>
+        String
+      </td>
+      <td>
+        <code>"html"</code>
+      </td>
+      <td>
+        The tagged function name.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>import</code>
+      </td>
+      <td>
+        <code>{ module: string; export: string }</code>
+      </td>
+      <td></td>
+      <td>
+        Add import for a tagged function.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>attributes</code>
+      </td>
+      <td>
+        <code>Array<{prefix: string; attributes: string[]; replace?: string;} | { preset?: 'lit-html' | 'global' }></code>
+      </td>
+      <td></td>
+      <td>
+        Mapping to convert JSX attributes.
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-| Option | Type    | Default  | Description
-|--------|---------|----------|------------
-| `tag`  | String  | `"html"` | The tagged function name.
-| `import`  | `{ module: string; export: string }`  |  | Add import for a tagged function.
-| `attributes`  | `Array<{prefix: string; attributes: string[]; replace?: string;} | { preset?: 'lit-html' | 'global' }>` |  | Mapping to convert JSX attributes.
-
-Options are passed to a Babel plugin using a nested Array:
+These options could be passed to the Babel plugin using a nested array. A complex config example:
 
 ```js
 "plugins": [
