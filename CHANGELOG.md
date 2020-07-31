@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Unreleased
 Convert JSX String Literal properties to the values of attributes on the specified elements.
+Add an option to set a custom function name for define Custom Element.
 
 
 ## [0.0.0] - 2020-04-16

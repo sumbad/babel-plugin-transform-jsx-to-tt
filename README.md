@@ -36,7 +36,7 @@ const baz = (
   <div>
     <li attr1="A">First item</li>
     <li attr2="B">Second item</li>
-    <li attr3="C">Third item</li>
+    <li attr3={"C"}>Third item</li>
     <li class="main-colour">Third item</li>
     <li hidden={true}>Third item</li>
     <li onclick={() => console.log('test')}>Third item</li>
@@ -53,13 +53,13 @@ const baz = (
 
 ```js
 const baz = html`<div>
-  <li .attr1="A">First item</li>
-  <li .attr2="B">Second item</li>
-  <li .attr3="C">Third item</li>
+  <li attr1="A">First item</li>
+  <li attr2="B">Second item</li>
+  <li .attr3=${"C"}>Third item</li>
   <li class="main-colour">Third item</li>
   <li ?hidden=${true}>Third item</li>
   <li @click=${() => console.log('test')}>Third item</li>
-  <button .color="blue" .shadowSize=${2} .shadowSizeSum=${2 + 1 + 1}>
+  <button color="blue" .shadowSize=${2} .shadowSizeSum=${2 + 1 + 1}>
     <small id=${Date.now()}>Click Me</small>
   </button>
   <my-comp .message=${'hello world'}></my-comp>
@@ -310,6 +310,20 @@ require('babel-core').transform('code', {
     </tr>
     <tr>
       <td>
+        <code>define</code>
+      </td>
+      <td>
+        String
+      </td>
+      <td>
+        <code></code>
+      </td>
+      <td>
+        A function name for define Custom Element. The first argument of this function has to be a Custom Element name - String value.
+      </td>
+    </tr>
+    <tr>
+      <td>
         <code>import</code>
       </td>
       <td>
@@ -341,6 +355,7 @@ These options could be passed to the Babel plugin using a nested array. A comple
 "plugins": [
   ["babel-plugin-transform-jsx-to-htm", {
     "tag": "html",
+    "define": "defineElement",
     "import": {
       "module": "some-html-render",
       "export": "html"

@@ -221,14 +221,20 @@ export default declare((api, options: Options = {}, dirname) => {
 
       scope.traverse(defBind.path.node, {
         CallExpression(path) {
-          if (t.isCallExpression(path.node)) {
-            if (
-              (t.isMemberExpression(path.node.callee) && path.node.callee.property.name === 'define') ||
-              (t.isIdentifier(path.node.callee) && path.node.callee.name === 'define')
-            ) {
-              if (t.isStringLiteral(path.node.arguments[0])) {
-                tag = path.node.arguments[0].value;
-              }
+          const node = path.node;
+          
+          if (t.isCallExpression(node)) {
+            const defineFuncName = options?.define;
+            const callee = node.callee;
+            const isDefineMemberExpression =
+              t.isMemberExpression(callee) && // and the function name equal...
+              (defineFuncName === undefined || callee.property.name === defineFuncName);
+            const isDefineIdentifier =
+              t.isIdentifier(callee) && // and the function name equal...
+              (defineFuncName === undefined || callee.name === defineFuncName);
+
+            if ((isDefineMemberExpression || isDefineIdentifier) && t.isStringLiteral(node.arguments[0])) {
+              tag = node.arguments[0].value;
             }
           }
         },
@@ -271,7 +277,7 @@ export default declare((api, options: Options = {}, dirname) => {
 
   /**
    * Change an attribute name by a map
-   * 
+   *
    * @param attrMap - the map with rules
    * @param attrName - the attribute name
    */
