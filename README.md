@@ -315,9 +315,7 @@ require('babel-core').transform('code', {
       <td>
         String
       </td>
-      <td>
-        <code></code>
-      </td>
+      <td></td>
       <td>
         A function name for define Custom Element. The first argument of this function has to be a Custom Element name - String value.
       </td>
