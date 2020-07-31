@@ -10,7 +10,7 @@
   </a>
 </div>
 
-<h1 align="center">babel-plugin-react-element-to-jsx-string</h1>
+<h1 align="center">babel-plugin-transform-jsx-to-tt</h1>
 
 <blockquote align="center">This is a babel plugin to converts JSX into Tagged Templates</blockquote>
 
