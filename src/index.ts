@@ -41,12 +41,16 @@ export default declare((api, options: Options = {}, dirname) => {
       },
       Program: {
         exit(path, state) {
-          if (getDefined(tagRootName, path.scope) === undefined && state.get('jsxElement') !== undefined && importDeclaration !== undefined) {
+          if (
+            getDefined(tagRootName, path.scope) === undefined &&
+            state.get('jsxElement') !== undefined &&
+            importDeclaration !== undefined
+          ) {
             path.unshiftContainer('body', importDeclaration);
           }
-        }
-      }
-    }
+        },
+      },
+    },
   };
 
   /**
@@ -64,10 +68,10 @@ export default declare((api, options: Options = {}, dirname) => {
         ? impOptions
         : {
             module: impOptions,
-            export: null
+            export: null,
           };
 
-    let specifier;
+    let specifier: t.ImportNamespaceSpecifier | t.ImportDefaultSpecifier | t.ImportSpecifier;
     if (export_ === '*') {
       specifier = t.importNamespaceSpecifier(tagRoot);
     } else if (export_ === 'default') {
@@ -86,8 +90,8 @@ export default declare((api, options: Options = {}, dirname) => {
    */
   function generateTemplateLiteral(parts: any[], state): Node | NodePath {
     // we have one mixed array and we need to split nodes by type
-    const quasis = [],
-      exprs = [];
+    const quasiList = [];
+    const exprs = [];
 
     let i = 0;
     // do one iteration more to make sure we produce an empty string quasi at the end
@@ -96,10 +100,10 @@ export default declare((api, options: Options = {}, dirname) => {
       // join adjacent strings into one
       while (typeof parts[i] === 'string') {
         // we need to escape backticks and backslashes manually
-        quasi += parts[i].replace(/[\\`]/g, s => `\\${s}`);
+        quasi += (parts[i] as string).replace(/[\\`]/g, (s) => `\\${s}`);
         i += 1;
       }
-      quasis.push(t.templateElement({ raw: quasi, cooked: quasi }, true));
+      quasiList.push(t.templateElement({ raw: quasi, cooked: quasi }, true));
 
       // add a single expr node
       if (parts[i] != null) {
@@ -110,7 +114,7 @@ export default declare((api, options: Options = {}, dirname) => {
     }
 
     state.set('jsxElement', true);
-    return t.taggedTemplateExpression(t.identifier(tagName), t.templateLiteral(quasis, exprs));
+    return t.taggedTemplateExpression(t.identifier(tagName), t.templateLiteral(quasiList, exprs));
   }
 
   /**
@@ -227,7 +231,7 @@ export default declare((api, options: Options = {}, dirname) => {
               }
             }
           }
-        }
+        },
       });
 
       return { tag };
@@ -249,40 +253,47 @@ export default declare((api, options: Options = {}, dirname) => {
       return [''];
     }
 
-    let attrName = attr.name.name;
+    const attrName = attr.name.name;
 
-    const mapping = (attrMap: Options['attributes'] = []) => {
-      for (const mapObj of attrMap) {
-        let result: string;
-        if ('preset' in mapObj) {
-          switch (mapObj.preset) {
-            case 'lit-html':
-              result = mapping(mappingAttrPresetLit);
-              break;
-            case 'global':
-              result = mapping(mappingAttrPresetGlobal);
-              break;
-          }
-          if (result !== undefined) {
-            return result;
-          }
-        } else if ('attributes' in mapObj && mapObj.attributes.some(r => attrName.match(new RegExp(`^${r}$$`)) !== null)) {
-          // add or replace an attribute prefix
-          return attrName.replace(new RegExp(`^${mapObj.replace || ''}`), mapObj.prefix);
-        }
-      }
-    };
-
-    attrName = mapping(options?.attributes) ?? attrName;
-
+    // if a value a simple string just return as the tag's attribute
     if (t.isStringLiteral(attr.value)) {
       return [` ${attrName}="${attr.value.value}"`];
     }
 
+    const mappedAttrName = mappingAttrName(options?.attributes, attrName) ?? attrName;
+
     if (t.isJSXExpressionContainer(attr.value)) {
-      return [` ${attrName}=`, attr.value.expression];
+      return [` ${mappedAttrName}=`, attr.value.expression];
     }
 
     throw new Error(`Couldn't transform attribute ${JSON.stringify(attrName)}`);
+  }
+
+  /**
+   * Change an attribute name by a map
+   * 
+   * @param attrMap - the map with rules
+   * @param attrName - the attribute name
+   */
+  function mappingAttrName(attrMap: Options['attributes'] = [], attrName: string) {
+    for (const mapObj of attrMap) {
+      let result: string;
+      if ('preset' in mapObj) {
+        switch (mapObj.preset) {
+          case 'lit-html':
+            result = mappingAttrName(mappingAttrPresetLit, attrName);
+            break;
+          case 'global':
+            result = mappingAttrName(mappingAttrPresetGlobal, attrName);
+            break;
+        }
+        if (result !== undefined) {
+          return result;
+        }
+      } else if ('attributes' in mapObj && mapObj.attributes.some((r) => attrName.match(new RegExp(`^${r}$$`)) !== null)) {
+        // add or replace an attribute prefix
+        return attrName.replace(new RegExp(`^${mapObj.replace || ''}`), mapObj.prefix);
+      }
+    }
   }
 });

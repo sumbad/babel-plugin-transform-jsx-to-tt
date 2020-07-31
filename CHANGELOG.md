@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 <!-- ## Unreleased -->
 
+
+## [0.1.0] - 2020-08-01
+
+### Unreleased
+Convert JSX String Literal properties to the values of attributes on the specified elements.
+
+
 ## [0.0.0] - 2020-04-16
 
 ### Added
