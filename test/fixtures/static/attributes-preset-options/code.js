@@ -2,7 +2,7 @@ const baz = (
   <div>
     <li attr1="A">First item</li>
     <li attr2="B">Second item</li>
-    <li attr3="C">Third item</li>
+    <li attr3={"C"}>Third item</li>
     <li class="main-colour">Third item</li>
     <li hidden={true}>Third item</li>
     <li onclick={()=>console.log('test')}>Third item</li>
