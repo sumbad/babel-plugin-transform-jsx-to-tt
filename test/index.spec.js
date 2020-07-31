@@ -6,5 +6,23 @@ import plugin from '../src';
 pluginTester({
   plugin,
   fixtures: path.join(__dirname, 'fixtures'),
-  // fixtures: path.join(__dirname, 'fixtures/dynamic'),
+
+  // tests: [
+  //   {
+  //     fixture: path.join(__dirname, 'fixtures/static/scope/code.js'),
+  //     outputFixture: path.join(__dirname, 'fixtures/static/scope/output.js'),
+  //   },
+  //   // {
+  //   //   fixture: path.join(__dirname, 'fixtures/static/attributes-preset-options/code.js'),
+  //   //   outputFixture: path.join(__dirname, 'fixtures/static/attributes-preset-options/output.js'),
+  //   //   pluginOptions: {
+  //   //     tag: 'html',
+  //   //     attributes: [
+  //   //       {
+  //   //         preset: 'lit-html',
+  //   //       },
+  //   //     ],
+  //   //   },
+  //   // },
+  // ],
 });
