@@ -131,9 +131,27 @@ export default declare((api, options: Options = {}, dirname) => {
     }
     if (elem.type == 'JSXElement') {
       const { tag, isVoid } = prepareElementTag(elem.openingElement.name, scope);
-      const attrs = elem.openingElement.attributes.map(transformJSXAttribute);
-      const children = elem.children.map(renderChildScope);
-      return ['<', tag, ...flatten(attrs), '>', ...(isVoid ? [] : flatten(children)), ...(isVoid ? [] : ['</', tag, '>'])];
+      if (typeof tag === 'object' && t.isCallExpression(tag)) {
+        const props = elem.openingElement.attributes.map((attr) => {
+          if (t.isJSXAttribute(attr)) {
+            // TODO: use children elements if they are
+            // REVIEW: isJSXExpressionContainer and isJSXEmptyExpression valueы
+            const value = t.isStringLiteral(attr.value)
+              ? attr.value
+              : t.isJSXExpressionContainer(attr.value) && !t.isJSXEmptyExpression(attr.value.expression)
+              ? attr.value.expression
+              : null;
+            return t.objectProperty(t.identifier(attr.name.name), value);
+          }
+        });
+        const args = [t.objectExpression(props)];
+        tag.arguments = args;
+        return [tag];
+      } else {
+        const attrs = elem.openingElement.attributes.map(transformJSXAttribute);
+        const children = elem.children.map(renderChildScope);
+        return ['<', tag, ...flatten(attrs), '>', ...(isVoid ? [] : flatten(children)), ...(isVoid ? [] : ['</', tag, '>'])];
+      }
     }
     throw new Error(`Unknown element type: ${elem.type}`);
   }
@@ -173,7 +191,7 @@ export default declare((api, options: Options = {}, dirname) => {
     jsxElement: t.JSXIdentifier | t.JSXMemberExpression | t.JSXNamespacedName,
     scope: Scope,
     isRoot = true
-  ): { tag: string | t.Identifier; isVoid?: boolean } {
+  ): { tag: string | t.Identifier | t.CallExpression; isVoid?: boolean } {
     if (t.isJSXIdentifier(jsxElement)) {
       return tagFromJSXIdentifier(jsxElement, scope, isRoot);
     } else {
@@ -199,7 +217,7 @@ export default declare((api, options: Options = {}, dirname) => {
    * @param isRoot - flag if the element is root
    */
   function tagFromJSXIdentifier(jsxIdentifier: t.JSXIdentifier, scope: Scope, isRoot: boolean) {
-    let tag = jsxIdentifier.name;
+    let tag: string | t.CallExpression = jsxIdentifier.name;
 
     // it's a single lowercase identifier (e.g. `foo`)
     if (isRoot && isCompatTag(tag)) {
@@ -219,10 +237,15 @@ export default declare((api, options: Options = {}, dirname) => {
         throw new Error(`Cannot find ${jsxIdentifier.name}`);
       }
 
+      let tagExpression: string | t.CallExpression;
       scope.traverse(defBind.path.node, {
         CallExpression(path) {
+          if (tagExpression !== undefined) {
+            return;
+          }
+
           const node = path.node;
-          
+
           if (t.isCallExpression(node)) {
             const defineFuncName = options?.define;
             const callee = node.callee;
@@ -233,14 +256,20 @@ export default declare((api, options: Options = {}, dirname) => {
               t.isIdentifier(callee) && // and the function name equal...
               (defineFuncName === undefined || callee.name === defineFuncName);
 
-            if ((isDefineMemberExpression || isDefineIdentifier) && t.isStringLiteral(node.arguments[0])) {
-              tag = node.arguments[0].value;
+            if (isDefineMemberExpression || isDefineIdentifier) {
+              if (t.isStringLiteral(node.arguments[0])) {
+                tagExpression = node.arguments[0].value;
+              }
+              else {
+                const funcName = t.identifier(tag);
+                tagExpression = t.callExpression(funcName, []);
+              }
             }
           }
         },
       });
 
-      return { tag };
+      return { tag: tagExpression || tag };
     }
     // it's not the only identifier, it's a part of a member expression
     // return it as identifier

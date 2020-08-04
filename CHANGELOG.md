@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- ## Unreleased -->
 
 
+## [0.2.0] - 2020-08-03
+
+### Added
+If a tag refers to a function that's first argument isn't a String Literal try to convert the tag to a Call Expression inside a Template Element.
+
 ## [0.1.0] - 2020-08-01
 
 ### Added

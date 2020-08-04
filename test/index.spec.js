@@ -9,8 +9,8 @@ pluginTester({
 
   // tests: [
   //   {
-  //     fixture: path.join(__dirname, 'fixtures/static/scope/code.js'),
-  //     outputFixture: path.join(__dirname, 'fixtures/static/scope/output.js'),
+  //     fixture: path.join(__dirname, 'fixtures/function/virtual/code.js'),
+  //     outputFixture: path.join(__dirname, 'fixtures/function/virtual/output.js'),
   //   },
   //   // {
   //   //   fixture: path.join(__dirname, 'fixtures/static/attributes-preset-options/code.js'),
