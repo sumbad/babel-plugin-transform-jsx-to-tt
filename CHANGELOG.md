@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- ## Unreleased -->
 
 
+## [0.3.0] - 2021-03-09
+
+### Added
+Add 'for' to the global attributes.
+
+
 ## [0.2.0] - 2020-08-03
 
 ### Added
