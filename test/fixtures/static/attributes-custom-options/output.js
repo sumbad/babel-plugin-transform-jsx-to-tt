@@ -5,7 +5,13 @@ const baz = html`<div>
   <li class="main-colour">Third item</li>
   <li hidden=${true}>Third item</li>
   <li onclick=${() => console.log("test")}>Third item</li>
-  <button color="blue" .shadowSize=${2} .shadowSizeSum=${2 + 1 + 1}>
+  <label for=${`btn_${Date.now()}`}></label>
+  <button
+    id=${`btn_${Date.now()}`}
+    color="blue"
+    .shadowSize=${2}
+    .shadowSizeSum=${2 + 1 + 1}
+  >
     <small id=${Date.now()}>Click Me</small>
   </button>
   <my-comp .message=${"hello world"}></my-comp>

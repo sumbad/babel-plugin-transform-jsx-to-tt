@@ -129,13 +129,13 @@ export default declare((api, options: Options = {}, dirname) => {
       const children = elem.children.map(renderChildScope);
       return [...flatten(children)];
     }
-    if (elem.type == 'JSXElement') {
+    if (t.isJSXElement(elem)) {
       const { tag, isVoid } = prepareElementTag(elem.openingElement.name, scope);
       if (typeof tag === 'object' && t.isCallExpression(tag)) {
         const props = elem.openingElement.attributes.map((attr) => {
-          if (t.isJSXAttribute(attr)) {
+          if (t.isJSXAttribute(attr) && typeof attr.name.name === 'string') {
             // TODO: use children elements if they are
-            // REVIEW: isJSXExpressionContainer and isJSXEmptyExpression valueы
+            // REVIEW: isJSXExpressionContainer and isJSXEmptyExpression values
             const value = t.isStringLiteral(attr.value)
               ? attr.value
               : t.isJSXExpressionContainer(attr.value) && !t.isJSXEmptyExpression(attr.value.expression)
@@ -217,7 +217,7 @@ export default declare((api, options: Options = {}, dirname) => {
    * @param isRoot - flag if the element is root
    */
   function tagFromJSXIdentifier(jsxIdentifier: t.JSXIdentifier, scope: Scope, isRoot: boolean) {
-    let tag: string | t.CallExpression = jsxIdentifier.name;
+    let tag: string = jsxIdentifier.name;
 
     // it's a single lowercase identifier (e.g. `foo`)
     if (isRoot && isCompatTag(tag)) {
@@ -251,7 +251,7 @@ export default declare((api, options: Options = {}, dirname) => {
             const callee = node.callee;
             const isDefineMemberExpression =
               t.isMemberExpression(callee) && // and the function name equal...
-              (defineFuncName === undefined || callee.property.name === defineFuncName);
+              (defineFuncName === undefined || ('name' in callee.property && callee.property.name === defineFuncName));
             const isDefineIdentifier =
               t.isIdentifier(callee) && // and the function name equal...
               (defineFuncName === undefined || callee.name === defineFuncName);
@@ -283,25 +283,29 @@ export default declare((api, options: Options = {}, dirname) => {
    *
    * TODO: t.JSXSpreadAttribute
    */
-  function transformJSXAttribute(attr: t.JSXAttribute) {
-    if (!t.isJSXIdentifier(attr.name)) {
-      return [''];
+  function transformJSXAttribute(attr: t.JSXAttribute | t.JSXSpreadAttribute) {
+    if(t.isJSXAttribute(attr)) {
+      if (!t.isJSXIdentifier(attr.name)) {
+        return [''];
+      }
+  
+      const attrName = attr.name.name;
+  
+      // if a value a simple string just return as the tag's attribute
+      if (t.isStringLiteral(attr.value)) {
+        return [` ${attrName}="${attr.value.value}"`];
+      }
+  
+      const mappedAttrName = mappingAttrName(options?.attributes, attrName) ?? attrName;
+  
+      if (t.isJSXExpressionContainer(attr.value)) {
+        return [` ${mappedAttrName}=`, attr.value.expression];
+      }  
+
+      throw new Error(`Couldn't transform attribute ${JSON.stringify(attrName)}`);
     }
 
-    const attrName = attr.name.name;
-
-    // if a value a simple string just return as the tag's attribute
-    if (t.isStringLiteral(attr.value)) {
-      return [` ${attrName}="${attr.value.value}"`];
-    }
-
-    const mappedAttrName = mappingAttrName(options?.attributes, attrName) ?? attrName;
-
-    if (t.isJSXExpressionContainer(attr.value)) {
-      return [` ${mappedAttrName}=`, attr.value.expression];
-    }
-
-    throw new Error(`Couldn't transform attribute ${JSON.stringify(attrName)}`);
+    throw new Error(`Couldn't transform attribute JSXSpreadAttribute`);
   }
 
   /**

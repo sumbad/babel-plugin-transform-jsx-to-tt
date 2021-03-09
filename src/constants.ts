@@ -55,7 +55,9 @@ export const mappingAttrPresetGlobal: Options['attributes'] = [
       'style',
       'tabindex',
       'title',
-      'translate'
+      'translate',
+      ///
+      'for',
     ]
   }
 ];
