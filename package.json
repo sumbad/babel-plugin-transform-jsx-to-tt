@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "name": "babel-plugin-transform-jsx-to-tt",
   "description": "The babel plugin converts JSX into Tagged templates",
   "repository": {
