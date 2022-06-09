@@ -218,7 +218,6 @@ export default declare((api, options: Options = {}, dirname) => {
    */
   function tagFromJSXIdentifier(jsxIdentifier: t.JSXIdentifier, scope: Scope, isRoot: boolean) {
     let tag: string = jsxIdentifier.name;
-
     // it's a single lowercase identifier (e.g. `foo`)
     if (isRoot && isCompatTag(tag)) {
       const isVoid = voidElements.includes(tag.toLowerCase());
@@ -233,41 +232,58 @@ export default declare((api, options: Options = {}, dirname) => {
       // return { tag: t.memberExpression(object, property) };
 
       const defBind = getDefined(jsxIdentifier.name, scope);
-      if (defBind === undefined) {
+      if (defBind == null) {
         throw new Error(`Cannot find ${jsxIdentifier.name}`);
       }
 
+      function functionsVisitor() {
+        if (tagExpression != null) {
+          return;
+        }
+
+        const funcName = t.identifier(tag);
+        tagExpression = t.callExpression(funcName, []);
+      }
+
       let tagExpression: string | t.CallExpression;
-      scope.traverse(defBind.path.node, {
-        CallExpression(path) {
-          if (tagExpression !== undefined) {
-            return;
-          }
 
-          const node = path.node;
+      // if it's a function declaration eg: "function Tag() {...}"
+      if (t.isFunctionDeclaration(defBind.path.node)) {
+        functionsVisitor();
+      } else {
+        // or we traverse (recursive validate) the node
+        scope.traverse(defBind.path.node, {
+          ArrowFunctionExpression: functionsVisitor,
+          FunctionExpression: functionsVisitor,
+          CallExpression(path) {
+            if (tagExpression != null) {
+              return;
+            }
 
-          if (t.isCallExpression(node)) {
-            const defineFuncName = options?.define;
-            const callee = node.callee;
-            const isDefineMemberExpression =
-              t.isMemberExpression(callee) && // and the function name equal...
-              (defineFuncName === undefined || ('name' in callee.property && callee.property.name === defineFuncName));
-            const isDefineIdentifier =
-              t.isIdentifier(callee) && // and the function name equal...
-              (defineFuncName === undefined || callee.name === defineFuncName);
+            const node = path.node;
 
-            if (isDefineMemberExpression || isDefineIdentifier) {
-              if (t.isStringLiteral(node.arguments[0])) {
-                tagExpression = node.arguments[0].value;
-              }
-              else {
-                const funcName = t.identifier(tag);
-                tagExpression = t.callExpression(funcName, []);
+            if (t.isCallExpression(node)) {
+              const defineFuncName = options?.define;
+              const callee = node.callee;
+              const isDefineMemberExpression =
+                t.isMemberExpression(callee) && // and the function name equal...
+                (defineFuncName === undefined || ('name' in callee.property && callee.property.name === defineFuncName));
+              const isDefineIdentifier =
+                t.isIdentifier(callee) && // and the function name equal...
+                (defineFuncName === undefined || callee.name === defineFuncName);
+
+              if (isDefineMemberExpression || isDefineIdentifier) {
+                if (t.isStringLiteral(node.arguments[0])) {
+                  tagExpression = node.arguments[0].value;
+                } else {
+                  const funcName = t.identifier(tag);
+                  tagExpression = t.callExpression(funcName, []);
+                }
               }
             }
-          }
-        },
-      });
+          },
+        });
+      }
 
       return { tag: tagExpression || tag };
     }
@@ -284,23 +300,23 @@ export default declare((api, options: Options = {}, dirname) => {
    * TODO: t.JSXSpreadAttribute
    */
   function transformJSXAttribute(attr: t.JSXAttribute | t.JSXSpreadAttribute) {
-    if(t.isJSXAttribute(attr)) {
+    if (t.isJSXAttribute(attr)) {
       if (!t.isJSXIdentifier(attr.name)) {
         return [''];
       }
-  
+
       const attrName = attr.name.name;
-  
+
       // if a value a simple string just return as the tag's attribute
       if (t.isStringLiteral(attr.value)) {
         return [` ${attrName}="${attr.value.value}"`];
       }
-  
+
       const mappedAttrName = mappingAttrName(options?.attributes, attrName) ?? attrName;
-  
+
       if (t.isJSXExpressionContainer(attr.value)) {
         return [` ${mappedAttrName}=`, attr.value.expression];
-      }  
+      }
 
       throw new Error(`Couldn't transform attribute ${JSON.stringify(attrName)}`);
     }
