@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- ## Unreleased -->
 
 
+## [0.3.1] - 2022-06-09
+
+### Fixed
+Translate JSX tags (eg. MyImage) to execution of a function if it is possible
+
 ## [0.3.0] - 2021-03-09
 
 ### Added
