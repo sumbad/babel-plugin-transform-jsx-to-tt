@@ -20,6 +20,14 @@ function Span() {
   return <span>test4</span>;
 }
 
+let Test5 = undefined;
+
+setTimeout(() => {
+  GraphNode = () => <span>test5</span>
+});
+
+const Test6 = <span>test6</span>;
+
 FC('demo', () => {
   return (
     <>
@@ -32,6 +40,10 @@ FC('demo', () => {
       <Div></Div>
 
       <Span></Span>
+
+      <Test5></Test5>
+
+      <Test6></Test6>
     </>
   );
 });

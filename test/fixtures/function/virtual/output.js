@@ -17,11 +17,17 @@ function Span() {
   return html`<span>test4</span>`;
 }
 
+let Test5 = undefined;
+setTimeout(() => {
+  GraphNode = () => html`<span>test5</span>`;
+});
+const Test6 = html`<span>test6</span>`;
 FC("demo", () => {
   return html`
     ${CounterVirtual({
       msg: "Hello",
     })}
-    ${Link({})} ${Image({})} ${Div({})} ${Span({})}
+    ${Link({})} ${Image({})} ${Div({})} ${Span({})} ${Test5({})}
+    ${html`<span>test6</span>`}
   `;
 });
