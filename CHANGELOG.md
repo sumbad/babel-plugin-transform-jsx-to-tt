@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- ### Security -->
 
 <!-- ## Unreleased -->
-## Unreleased
+
+## [0.4.0] - 2022-06-29
 
 ### Added
 Support JSX variables.
