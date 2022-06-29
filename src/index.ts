@@ -58,8 +58,8 @@ export default declare((api, options: Options = {}, dirname) => {
    *
    * @param impOptions - options for an import declaration
    */
-  function generateImportDeclaration(impOptions: { module: string; export: string }) {
-    if (impOptions === undefined) {
+  function generateImportDeclaration(impOptions?: { module: string; export: string }) {
+    if (impOptions == undefined) {
       return;
     }
     const tagRoot = t.identifier(tagRootName);
@@ -90,8 +90,8 @@ export default declare((api, options: Options = {}, dirname) => {
    */
   function generateTemplateLiteral(parts: any[], state): Node | NodePath {
     // we have one mixed array and we need to split nodes by type
-    const quasiList = [];
-    const exprs = [];
+    const quasiList: t.TemplateElement[] = [];
+    const exprs: (t.Expression | t.TSType)[] = [];
 
     let i = 0;
     // do one iteration more to make sure we produce an empty string quasi at the end
@@ -132,20 +132,25 @@ export default declare((api, options: Options = {}, dirname) => {
     if (t.isJSXElement(elem)) {
       const { tag, isVoid } = prepareElementTag(elem.openingElement.name, scope);
       if (typeof tag === 'object' && t.isCallExpression(tag)) {
-        const props = elem.openingElement.attributes.map((attr) => {
+        const props: (t.ObjectMethod | t.ObjectProperty | t.SpreadElement)[] = [];
+
+        for (const attr of elem.openingElement.attributes) {
           if (t.isJSXAttribute(attr) && typeof attr.name.name === 'string') {
             // TODO: use children elements if they are
             // REVIEW: isJSXExpressionContainer and isJSXEmptyExpression values
-            const value = t.isStringLiteral(attr.value)
-              ? attr.value
-              : t.isJSXExpressionContainer(attr.value) && !t.isJSXEmptyExpression(attr.value.expression)
-              ? attr.value.expression
-              : null;
-            return t.objectProperty(t.identifier(attr.name.name), value);
+            if (t.isStringLiteral(attr.value)) {
+              props.push(t.objectProperty(t.identifier(attr.name.name), attr.value));
+            } else if (t.isJSXExpressionContainer(attr.value) && !t.isJSXEmptyExpression(attr.value.expression)) {
+              props.push(t.objectProperty(t.identifier(attr.name.name), attr.value.expression));
+            }
           }
-        });
+        }
+
         const args = [t.objectExpression(props)];
         tag.arguments = args;
+        return [tag];
+      }
+      if (typeof tag === 'object' && t.isTaggedTemplateExpression(tag)) {
         return [tag];
       } else {
         const attrs = elem.openingElement.attributes.map(transformJSXAttribute);
@@ -191,7 +196,7 @@ export default declare((api, options: Options = {}, dirname) => {
     jsxElement: t.JSXIdentifier | t.JSXMemberExpression | t.JSXNamespacedName,
     scope: Scope,
     isRoot = true
-  ): { tag: string | t.Identifier | t.CallExpression; isVoid?: boolean } {
+  ): { tag: string | t.Identifier | t.CallExpression | t.TaggedTemplateExpression; isVoid?: boolean } {
     if (t.isJSXIdentifier(jsxElement)) {
       return tagFromJSXIdentifier(jsxElement, scope, isRoot);
     } else {
@@ -236,6 +241,8 @@ export default declare((api, options: Options = {}, dirname) => {
         throw new Error(`Cannot find ${jsxIdentifier.name}`);
       }
 
+      let tagExpression: t.CallExpression | t.TaggedTemplateExpression | string | undefined;
+
       function functionsVisitor() {
         if (tagExpression != null) {
           return;
@@ -244,8 +251,6 @@ export default declare((api, options: Options = {}, dirname) => {
         const funcName = t.identifier(tag);
         tagExpression = t.callExpression(funcName, []);
       }
-
-      let tagExpression: string | t.CallExpression;
 
       // if it's a function declaration eg: "function Tag() {...}"
       if (t.isFunctionDeclaration(defBind.path.node)) {
@@ -282,7 +287,17 @@ export default declare((api, options: Options = {}, dirname) => {
               }
             }
           },
+          TaggedTemplateExpression(path) {
+            if (tagExpression != null) {
+              return;
+            }
+            tagExpression = path.node;
+          },
         });
+      }
+
+      if(tagExpression == null && t.isVariableDeclarator(defBind.path.node)) {
+        functionsVisitor();
       }
 
       return { tag: tagExpression || tag };
@@ -332,7 +347,7 @@ export default declare((api, options: Options = {}, dirname) => {
    */
   function mappingAttrName(attrMap: Options['attributes'] = [], attrName: string) {
     for (const mapObj of attrMap) {
-      let result: string;
+      let result: string | undefined;
       if ('preset' in mapObj) {
         switch (mapObj.preset) {
           case 'lit-html':
@@ -342,7 +357,7 @@ export default declare((api, options: Options = {}, dirname) => {
             result = mappingAttrName(mappingAttrPresetGlobal, attrName);
             break;
         }
-        if (result !== undefined) {
+        if (result != null) {
           return result;
         }
       } else if ('attributes' in mapObj && mapObj.attributes.some((r) => attrName.match(new RegExp(`^${r}$$`)) !== null)) {

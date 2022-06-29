@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!-- ### Security -->
 
 <!-- ## Unreleased -->
+## Unreleased
+
+### Added
+Support JSX variables.
+Transform any unknown identifier to a callable expression.
 
 
 ## [0.3.1] - 2022-06-09
