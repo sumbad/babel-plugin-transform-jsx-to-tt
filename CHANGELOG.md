@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-### Added
+### [0.5.0] - 2023-10-06
 - Property to force all attributes to be wrapped in quotes - `quotedAttributes`.
 
 ## [0.4.0] - 2022-06-29
