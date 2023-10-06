@@ -9,4 +9,5 @@ export interface Options {
   tag?: string;
   attributes?: Array<OptionAttrMap | { preset?: 'lit-html' | 'global' }>;
   define?: string;
+  quotedAttributes?: boolean;
 }

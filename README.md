@@ -299,7 +299,7 @@ require('babel-core').transform('code', {
         <code>tag</code>
       </td>
       <td>
-        String
+        <code>String</code>
       </td>
       <td>
         <code>"html"</code>
@@ -313,7 +313,7 @@ require('babel-core').transform('code', {
         <code>define</code>
       </td>
       <td>
-        String
+        <code>String</code>
       </td>
       <td></td>
       <td>
@@ -342,6 +342,18 @@ require('babel-core').transform('code', {
       <td></td>
       <td>
         Mapping to convert JSX attributes.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>quotedAttributes</code>
+      </td>
+      <td>
+        <code>Boolean</code>
+      </td>
+      <td><code>false</code></td>
+      <td>
+        A property to force all attributes to be wrapped in quotes.
       </td>
     </tr>
   </tbody>

@@ -12,6 +12,7 @@ export default declare((api, options: Options = {}, dirname) => {
   const tagName = options.tag ?? 'html';
   const tagRootName = tagName.split('.')[0];
   const importDeclaration = generateImportDeclaration(options.import);
+  const isQuotedAttributes = options.quotedAttributes ?? false;
 
   // TODO: prepare attributes mapping only once here
 
@@ -296,7 +297,7 @@ export default declare((api, options: Options = {}, dirname) => {
         });
       }
 
-      if(tagExpression == null && t.isVariableDeclarator(defBind.path.node)) {
+      if (tagExpression == null && t.isVariableDeclarator(defBind.path.node)) {
         functionsVisitor();
       }
 
@@ -330,7 +331,8 @@ export default declare((api, options: Options = {}, dirname) => {
       const mappedAttrName = mappingAttrName(options?.attributes, attrName) ?? attrName;
 
       if (t.isJSXExpressionContainer(attr.value)) {
-        return [` ${mappedAttrName}=`, attr.value.expression];
+        const quote = isQuotedAttributes ? '"' : '';
+        return [` ${mappedAttrName}=`, quote, attr.value.expression, quote];
       }
 
       throw new Error(`Couldn't transform attribute ${JSON.stringify(attrName)}`);
